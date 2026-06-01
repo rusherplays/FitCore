@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FitCore">
+<title>FitCore — Your Personal Fitness OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #00E5A0;
+  --primary-dim: #00b87e;
+  --accent: #FF5C5C;
+  --gold: #FFD166;
+  --bg: #0a0a0f;
+  --bg2: #13131c;
+  --bg3: #1a1a28;
+  --bg4: #22223a;
+  --surface: #1e1e30;
+  --surface2: #252540;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #f0f0f8;
+  --text2: #a0a0c0;
+  --text3: #606080;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --glow: 0 0 30px rgba(0,229,160,0.15);
+  --ff: 'Syne', sans-serif;
+  --fb: 'DM Sans', sans-serif;
+}
+.light {
+  --primary: #00a86b;
+  --primary-dim: #008a57;
+  --accent: #e53935;
+  --gold: #f9a825;
+  --bg: #f0f2f5;
+  --bg2: #ffffff;
+  --bg3: #f8f9fc;
+  --bg4: #eef0f5;
+  --surface: #ffffff;
+  --surface2: #f0f2f8;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text: #0d0d1a;
+  --text2: #555575;
+  --text3: #9090aa;
+  --shadow: 0 8px 32px rgba(0,0,0,0.08);
+  --glow: 0 0 30px rgba(0,168,107,0.1);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { height: 100%; height: -webkit-fill-available; }
+body { 
+  min-height: 100%; 
+  min-height: -webkit-fill-available;
+  min-height: 100dvh;
+  overflow:hidden; 
+  font-family:var(--fb); 
+  background:var(--bg); 
+  color:var(--text); 
+  transition:background 0.3s,color 0.3s; 
+}
+#app { 
+  height: 100vh;
+  height: 100dvh;
+  display:flex; 
+  flex-direction:column; 
+  overflow:hidden;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+}
+
+/* HEADER */
+.header { 
+  display:flex; align-items:center; justify-content:space-between; 
+  padding:14px 18px 10px; 
+  padding-top: calc(14px + env(safe-area-inset-top, 0px));
+  background:var(--bg2); 
+  border-bottom:1px solid var(--border); position:relative; z-index:10;
+  flex-shrink:0;
+}
+.header-logo { display:flex; align-items:center; gap:8px; }
+.logo-icon { width:34px; height:34px; background:var(--primary); border-radius:10px;
+  display:flex; align-items:center; justify-content:center; font-family:var(--ff); font-weight:800; font-size:15px; color:#000; }
+.logo-text { font-family:var(--ff); font-weight:700; font-size:18px; }
+.logo-text span { color:var(--primary); }
+.header-actions { display:flex; align-items:center; gap:10px; }
+.theme-toggle { width:44px; height:24px; background:var(--bg4); border-radius:12px; 
+  border:none; cursor:pointer; position:relative; transition:background 0.3s; }
+.theme-toggle::after { content:''; position:absolute; top:3px; left:3px; 
+  width:18px; height:18px; background:var(--primary); border-radius:50%; 
+  transition:transform 0.3s, background 0.3s; }
+.light .theme-toggle::after { transform:translateX(20px); background:var(--gold); }
+.streak-badge { display:flex; align-items:center; gap:4px; background:var(--bg4); 
+  padding:4px 10px; border-radius:20px; font-size:13px; font-family:var(--ff); font-weight:600; }
+.streak-badge .fire { font-size:16px; }
+
+/* NAV */
+.nav { 
+  display:flex; 
+  background:var(--bg2); 
+  border-top:1px solid var(--border); 
+  flex-shrink:0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 50;
+  position: relative;
+}
+.nav-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; 
+  padding:8px 4px; border:none; background:transparent; color:var(--text3); 
+  cursor:pointer; font-family:var(--fb); font-size:10px; font-weight:500; transition:color 0.2s; }
+.nav-btn svg { width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.nav-btn.active { color:var(--primary); }
+.nav-btn.active svg { stroke:var(--primary); }
+
+/* CONTENT */
+.content { flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; min-height:0; }
+.page { display:none; padding:16px; }
+.page.active { display:block; }
+
+/* CARDS */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:12px; }
+.card-title { font-family:var(--ff); font-weight:700; font-size:16px; margin-bottom:12px; }
+
+/* HOME PAGE */
+.greeting { margin-bottom:18px; }
+.greeting h1 { font-family:var(--ff); font-weight:800; font-size:24px; line-height:1.2; }
+.greeting p { color:var(--text2); font-size:14px; margin-top:4px; }
+.stats-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:14px; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px; }
+.stat-card .label { font-size:11px; color:var(--text3); text-transform:uppercase; letter-spacing:0.8px; font-weight:600; margin-bottom:6px; }
+.stat-card .value { font-family:var(--ff); font-weight:700; font-size:22px; }
+.stat-card .unit { font-size:12px; color:var(--text2); margin-left:3px; font-weight:400; }
+.stat-card .sub { font-size:12px; color:var(--text2); margin-top:2px; }
+
+.progress-ring-wrap { display:flex; justify-content:center; margin-bottom:18px; }
+.ring-container { position:relative; width:140px; height:140px; }
+.ring-container svg { position:absolute; top:0; left:0; transform:rotate(-90deg); }
+.ring-info { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+.ring-info .pct { font-family:var(--ff); font-weight:800; font-size:28px; }
+.ring-info .lbl { font-size:11px; color:var(--text2); }
+
+.today-workout { margin-bottom:14px; }
+.workout-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+.badge.green { background:rgba(0,229,160,0.15); color:var(--primary); }
+.badge.red { background:rgba(255,92,92,0.15); color:var(--accent); }
+.badge.gold { background:rgba(255,209,102,0.15); color:var(--gold); }
+
+.exercise-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+.exercise-row:last-child { border-bottom:none; }
+.ex-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.ex-info { flex:1; }
+.ex-name { font-weight:600; font-size:14px; }
+.ex-sets { font-size:12px; color:var(--text2); margin-top:1px; }
+.ex-check { width:24px; height:24px; border-radius:8px; border:2px solid var(--border2); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; flex-shrink:0; }
+.ex-check.done { background:var(--primary); border-color:var(--primary); }
+.ex-check.done::after { content:'✓'; color:#000; font-size:13px; font-weight:700; }
+
+.start-btn { width:100%; padding:14px; background:var(--primary); color:#000; border:none; border-radius:var(--radius); font-family:var(--ff); font-weight:700; font-size:16px; cursor:pointer; margin-top:4px; transition:opacity 0.2s; }
+.start-btn:active { opacity:0.85; }
+
+/* CALENDAR STREAK */
+.streak-calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:8px; }
+.streak-day { aspect-ratio:1; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; }
+.streak-day.done { background:rgba(0,229,160,0.25); color:var(--primary); }
+.streak-day.today { background:var(--primary); color:#000; }
+.streak-day.rest { background:var(--bg4); color:var(--text3); }
+.streak-day.missed { background:rgba(255,92,92,0.15); color:var(--accent); }
+.streak-labels { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:10px; }
+.streak-labels span { text-align:center; font-size:10px; color:var(--text3); font-weight:600; }
+
+/* WORKOUT PAGE */
+.section-title { font-family:var(--ff); font-weight:700; font-size:18px; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.section-num { width:26px; height:26px; background:var(--primary); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#000; font-weight:800; }
+
+.workout-phase { margin-bottom:18px; }
+.phase-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:8px; cursor:pointer; }
+.phase-header h3 { font-family:var(--ff); font-weight:700; font-size:14px; }
+.phase-meta { font-size:12px; color:var(--text2); }
+.phase-chevron { transition:transform 0.3s; color:var(--text3); }
+.phase-chevron.open { transform:rotate(180deg); }
+.phase-exercises { overflow:hidden; transition:max-height 0.4s ease; }
+
+.exercise-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; margin-bottom:8px; cursor:pointer; transition:border-color 0.2s; }
+.exercise-card:hover { border-color:var(--primary); }
+.exercise-card .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.exercise-card h4 { font-family:var(--ff); font-weight:700; font-size:15px; }
+.exercise-card .sets-reps { font-size:12px; color:var(--primary); font-weight:600; }
+.exercise-card p { font-size:13px; color:var(--text2); line-height:1.5; }
+
+/* ANIMATION VIEW */
+.animation-modal { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:100; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:20px 16px; overflow-y:auto; }
+.anim-card { background:var(--bg2); border-radius:20px; width:100%; max-width:420px; overflow:hidden; }
+.anim-header { padding:16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+.anim-header h3 { font-family:var(--ff); font-weight:700; font-size:18px; }
+.close-btn { width:32px; height:32px; border-radius:10px; background:var(--bg4); border:none; color:var(--text); cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; }
+.anim-visual { padding:24px; display:flex; justify-content:center; }
+.anim-info { padding:0 16px 16px; }
+.anim-sets { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+.set-pill { padding:6px 14px; border-radius:20px; font-size:13px; font-weight:600; background:var(--bg4); color:var(--text2); cursor:pointer; border:2px solid transparent; transition:all 0.2s; }
+.set-pill.active { background:rgba(0,229,160,0.15); color:var(--primary); border-color:var(--primary); }
+.set-pill.done { background:rgba(0,229,160,0.3); color:var(--primary-dim); border-color:var(--primary-dim); }
+.done-btn { width:100%; padding:14px; background:var(--primary); color:#000; border:none; border-radius:var(--radius); font-family:var(--ff); font-weight:700; font-size:15px; cursor:pointer; margin-top:14px; }
+
+/* TIMER */
+.timer-display { text-align:center; padding:24px; }
+.timer-circle { width:180px; height:180px; margin:0 auto 20px; position:relative; }
+.timer-circle svg { position:absolute; inset:0; transform:rotate(-90deg); }
+.timer-num { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:var(--ff); font-weight:800; font-size:44px; }
+.timer-unit { font-size:14px; color:var(--text2); font-weight:400; display:block; }
+.timer-btns { display:flex; gap:10px; justify-content:center; }
+.timer-btn { padding:10px 24px; border-radius:var(--radius-sm); border:none; font-family:var(--ff); font-weight:700; font-size:14px; cursor:pointer; transition:opacity 0.2s; }
+.timer-btn.start { background:var(--primary); color:#000; }
+.timer-btn.reset { background:var(--bg4); color:var(--text); }
+
+/* AI CHAT */
+.chat-container { display:flex; flex-direction:column; height:100%; }
+.chat-messages { flex:1; overflow-y:auto; padding:16px; }
+.chat-msg { margin-bottom:14px; }
+.chat-msg .bubble { display:inline-block; max-width:85%; padding:10px 14px; border-radius:16px; font-size:14px; line-height:1.5; }
+.chat-msg.user { text-align:right; }
+.chat-msg.user .bubble { background:var(--primary); color:#000; border-radius:16px 16px 4px 16px; font-weight:500; }
+.chat-msg.ai .bubble { background:var(--surface); border:1px solid var(--border); border-radius:4px 16px 16px 16px; color:var(--text); }
+.chat-msg .time { font-size:10px; color:var(--text3); margin-top:4px; }
+.chat-input-wrap { padding:12px 16px; background:var(--bg2); border-top:1px solid var(--border); display:flex; gap:10px; align-items:flex-end; }
+.chat-input { flex:1; background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-sm); padding:10px 14px; color:var(--text); font-family:var(--fb); font-size:14px; resize:none; min-height:40px; max-height:120px; outline:none; }
+.chat-input:focus { border-color:var(--primary); }
+.send-btn { width:40px; height:40px; background:var(--primary); border:none; border-radius:var(--radius-sm); cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:opacity 0.2s; }
+.send-btn:active { opacity:0.85; }
+.send-btn svg { width:18px; height:18px; stroke:#000; fill:none; stroke-width:2.2; }
+.chat-suggestions { padding:8px 16px 0; display:flex; gap:8px; overflow-x:auto; }
+.chat-suggestions::-webkit-scrollbar { display:none; }
+.suggest-chip { white-space:nowrap; padding:6px 12px; background:var(--surface); border:1px solid var(--border2); border-radius:20px; font-size:12px; cursor:pointer; transition:border-color 0.2s; flex-shrink:0; }
+.suggest-chip:hover { border-color:var(--primary); color:var(--primary); }
+.ai-thinking { display:flex; gap:4px; padding:10px 14px; }
+.ai-thinking span { width:7px; height:7px; background:var(--text3); border-radius:50%; animation:pulse 1.2s ease-in-out infinite; }
+.ai-thinking span:nth-child(2) { animation-delay:0.2s; }
+.ai-thinking span:nth-child(3) { animation-delay:0.4s; }
+@keyframes pulse { 0%,80%,100%{transform:scale(0.6);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
+/* PROGRESS PAGE */
+.calendar-full { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:16px; }
+.cal-day { aspect-ratio:1; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; }
+.cal-day .num { font-weight:700; font-size:13px; }
+.cal-day.empty { opacity:0; }
+.cal-day.done { background:rgba(0,229,160,0.2); color:var(--primary); }
+.cal-day.today { background:var(--primary); color:#000; }
+.cal-day.future { background:var(--bg4); color:var(--text3); }
+.cal-day.rest { background:var(--bg4); color:var(--text3); }
+
+.progress-bar { height:8px; background:var(--bg4); border-radius:4px; overflow:hidden; margin:6px 0; }
+.progress-fill { height:100%; background:var(--primary); border-radius:4px; transition:width 0.6s ease; }
+
+.chart-bars { display:flex; align-items:flex-end; gap:8px; height:100px; margin:12px 0; }
+.chart-bar { flex:1; border-radius:4px 4px 0 0; background:rgba(0,229,160,0.3); transition:height 0.5s; position:relative; cursor:pointer; }
+.chart-bar.active { background:var(--primary); }
+.chart-bar .tip { position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:10px; font-weight:600; color:var(--text2); white-space:nowrap; }
+.chart-labels { display:flex; gap:8px; }
+.chart-labels span { flex:1; text-align:center; font-size:10px; color:var(--text3); }
+
+/* NUTRITION */
+.macro-ring { display:flex; justify-content:space-around; margin-bottom:14px; }
+.macro-item { text-align:center; }
+.macro-circle { width:70px; height:70px; position:relative; margin:0 auto 6px; }
+.macro-circle svg { transform:rotate(-90deg); }
+.macro-val { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-family:var(--ff); font-weight:700; font-size:14px; }
+.macro-name { font-size:11px; color:var(--text2); }
+
+/* STICKMAN ANIMATION */
+.stickman { width:120px; height:120px; }
+
+/* WORKOUT ACTIVE SCREEN */
+.workout-active { position:fixed; inset:0; background:var(--bg); z-index:200; display:flex; flex-direction:column; padding-bottom: env(safe-area-inset-bottom, 0px); }
+.wa-header { padding:14px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid var(--border); }
+.wa-back { width:36px; height:36px; border-radius:10px; background:var(--bg4); border:none; color:var(--text); cursor:pointer; font-size:18px; }
+.wa-title { font-family:var(--ff); font-weight:700; font-size:17px; flex:1; }
+.wa-timer { font-family:var(--ff); font-weight:700; font-size:17px; color:var(--primary); }
+.wa-content { flex:1; overflow-y:auto; padding:16px; }
+.wa-exercise { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:12px; }
+.wa-ex-name { font-family:var(--ff); font-weight:700; font-size:18px; margin-bottom:6px; }
+.wa-ex-detail { font-size:13px; color:var(--text2); margin-bottom:14px; }
+.wa-set-tracker { display:flex; gap:8px; flex-wrap:wrap; }
+.wa-set { width:44px; height:44px; border-radius:10px; border:2px solid var(--border2); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:var(--ff); font-weight:700; font-size:14px; color:var(--text2); transition:all 0.2s; }
+.wa-set.done { background:var(--primary); border-color:var(--primary); color:#000; }
+.wa-footer { padding:14px 16px; background:var(--bg2); border-top:1px solid var(--border); display:flex; gap:10px; }
+.wa-btn { flex:1; padding:13px; border:none; border-radius:var(--radius-sm); font-family:var(--ff); font-weight:700; font-size:14px; cursor:pointer; }
+.wa-btn.primary { background:var(--primary); color:#000; }
+.wa-btn.secondary { background:var(--bg4); color:var(--text); }
+
+/* SVG ANIMATIONS */
+@keyframes pushup { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes curl { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(-20deg)} }
+@keyframes jump { 0%,100%{transform:translateY(0)} 40%{transform:translateY(-15px)} }
+@keyframes squat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
+@keyframes plank-pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+@keyframes skip { 0%,100%{transform:translateY(0) rotate(0deg)} 25%{transform:translateY(-12px)} 75%{transform:translateY(-12px)} }
+@keyframes row-arm { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(25deg)} }
+@keyframes lunge-move { 0%,100%{transform:translateX(0)} 50%{transform:translateX(5px)} }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+
+/* TOAST */
+.toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--surface); border:1px solid var(--border2); border-radius:var(--radius-sm); padding:10px 20px; font-size:14px; font-weight:500; opacity:0; transition:all 0.3s; z-index:999; white-space:nowrap; box-shadow:var(--shadow); }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* SCROLLBARS */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+
+/* COMPLETION SCREEN */
+.completion { position:fixed; inset:0; background:var(--bg); z-index:300; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px; text-align:center; }
+.completion-icon { font-size:72px; margin-bottom:20px; animation:float 2s ease-in-out infinite; }
+.completion h1 { font-family:var(--ff); font-weight:800; font-size:32px; margin-bottom:8px; }
+.completion p { color:var(--text2); font-size:16px; margin-bottom:28px; }
+.completion-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; width:100%; margin-bottom:28px; }
+.comp-stat { background:var(--surface); border-radius:var(--radius-sm); padding:14px 10px; }
+.comp-stat .v { font-family:var(--ff); font-weight:800; font-size:22px; color:var(--primary); }
+.comp-stat .l { font-size:11px; color:var(--text2); margin-top:3px; }
+
+/* RESPONSIVE */
+@media(max-width:380px) {
+  .stats-grid { grid-template-columns:repeat(2,1fr); gap:8px; }
+  .greeting h1 { font-size:20px; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">
+      <div class="logo-icon">FC</div>
+      <div class="logo-text">Fit<span>Core</span></div>
+    </div>
+    <div class="header-actions">
+      <div class="streak-badge">
+        <span class="fire">🔥</span>
+        <span id="streakCount">0</span>
+      </div>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme"></button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- HOME PAGE -->
+    <div class="page active" id="page-home">
+      <div class="greeting">
+        <h1 id="greetMsg">Good Morning! 💪</h1>
+        <p id="dateStr">Loading...</p>
+      </div>
+
+      <!-- Progress Ring -->
+      <div class="progress-ring-wrap">
+        <div class="ring-container">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="58" fill="none" stroke="var(--bg4)" stroke-width="10"/>
+            <circle id="progressRing" cx="70" cy="70" r="58" fill="none" stroke="var(--primary)" stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="364.4" stroke-dashoffset="364.4"/>
+          </svg>
+          <div class="ring-info">
+            <div class="pct" id="progressPct">0%</div>
+            <div class="lbl">Today's Goal</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="label">Streak</div>
+          <div class="value" id="st-streak">0<span class="unit">days</span></div>
+          <div class="sub">🔥 Keep going!</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Workouts</div>
+          <div class="value" id="st-total">0<span class="unit">done</span></div>
+          <div class="sub">This month</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Calories</div>
+          <div class="value">2100<span class="unit">kcal</span></div>
+          <div class="sub">Target today</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Protein</div>
+          <div class="value">100<span class="unit">g</span></div>
+          <div class="sub">Daily goal</div>
+        </div>
+      </div>
+
+      <!-- Today's Workout Preview -->
+      <div class="card today-workout">
+        <div class="workout-header">
+          <div class="card-title" style="margin-bottom:0">Today's Plan</div>
+          <span class="badge green">5 Phases</span>
+        </div>
+        <div id="todayExercises">
+          <!-- populated by JS -->
+        </div>
+        <button class="start-btn" onclick="startWorkout()">▶ Start Today's Workout</button>
+      </div>
+
+      <!-- Weekly Streak Calendar -->
+      <div class="card">
+        <div class="card-title">This Week</div>
+        <div class="streak-labels">
+          <span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span>
+        </div>
+        <div class="streak-calendar" id="weekCalendar"></div>
+        <p style="font-size:12px;color:var(--text2);margin-top:8px;">
+          <span style="color:var(--primary)">●</span> Completed &nbsp;
+          <span style="color:var(--accent)">●</span> Missed &nbsp;
+          <span style="color:var(--text3)">●</span> Rest
+        </p>
+      </div>
+
+      <!-- Daily Targets -->
+      <div class="card">
+        <div class="card-title">Daily Targets</div>
+        <div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span>💧 Water <span style="color:var(--text3)">(3-4L)</span></span>
+            <span id="waterVal" style="color:var(--primary);font-weight:600">0 / 4L</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="waterBar" style="width:0%"></div></div>
+        </div>
+        <div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span>👟 Steps <span style="color:var(--text3)">(8000-10000)</span></span>
+            <span id="stepsVal" style="color:var(--primary);font-weight:600">0 / 10k</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="stepsBar" style="width:0%"></div></div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span>😴 Sleep <span style="color:var(--text3)">(7-8 hrs)</span></span>
+            <span id="sleepVal" style="color:var(--primary);font-weight:600">0 / 8h</span>
+          </div>
+          <div class="progress-bar"><div class="progress-fill" id="sleepBar" style="width:0%"></div></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button onclick="logWater()" style="flex:1;padding:8px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);border-radius:var(--radius-sm);color:var(--primary);font-family:var(--ff);font-weight:600;font-size:13px;cursor:pointer">+ Water</button>
+          <button onclick="logSteps()" style="flex:1;padding:8px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);border-radius:var(--radius-sm);color:var(--primary);font-family:var(--ff);font-weight:600;font-size:13px;cursor:pointer">+ Steps</button>
+          <button onclick="logSleep()" style="flex:1;padding:8px;background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);border-radius:var(--radius-sm);color:var(--primary);font-family:var(--ff);font-weight:600;font-size:13px;cursor:pointer">+ Sleep</button>
+        </div>
+      </div>
+
+      <!-- Post Workout -->
+      <div class="card" style="margin-bottom:80px">
+        <div class="card-title">Post-Workout Nutrition</div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <div style="font-size:36px">🥛</div>
+          <div>
+            <p style="font-size:14px;font-weight:600;margin-bottom:4px">Refuel within 30 minutes</p>
+            <p style="font-size:13px;color:var(--text2)">Whey Protein · Milk · Soya Chunks</p>
+            <span class="badge gold" style="margin-top:6px;display:inline-flex">100–120g protein/day</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WORKOUT PAGE -->
+    <div class="page" id="page-workout">
+      <div class="section-title">
+        <div class="section-num">W</div>
+        Workout Plan
+      </div>
+
+      <!-- Phase 1: Warm Up -->
+      <div class="workout-phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div>
+            <h3>🌅 1. Warm Up</h3>
+            <div class="phase-meta">5 minutes · 4 exercises</div>
+          </div>
+          <svg class="phase-chevron open" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+        </div>
+        <div class="phase-exercises" style="max-height:1000px">
+          <div class="exercise-card" onclick="showExercise('Neck Rotation','Gently rotate your neck side to side and in circles to loosen up the cervical spine.','2 sets × 10 reps each side','warmup','#FFD166')">
+            <div class="top"><h4>Neck Rotation</h4><span class="sets-reps">2×10 each side</span></div>
+            <p>Loosens cervical spine, prevents injury. Slow, controlled rotations.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Arm Circles','Extend arms and make forward and backward circles to warm up shoulder joints.','2 sets × 15 reps','warmup','#FFD166')">
+            <div class="top"><h4>Arm Circles</h4><span class="sets-reps">2×15 reps</span></div>
+            <p>Warms shoulder joints and rotator cuff muscles.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Light Stretching','Full body dynamic stretches — legs, hips, back, and arms.','60 seconds','warmup','#FFD166')">
+            <div class="top"><h4>Light Stretching</h4><span class="sets-reps">60 seconds</span></div>
+            <p>Full body dynamic stretches to increase blood flow.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Jumping Jacks','Classic full-body cardio warm-up. Arms and legs move simultaneously.','3 sets × 20 reps','cardio','#00E5A0')">
+            <div class="top"><h4>Jumping Jacks</h4><span class="sets-reps">3×20 reps</span></div>
+            <p>Elevates heart rate and activates full body musculature.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2: Rope Skipping -->
+      <div class="workout-phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div>
+            <h3>🪢 2. Rope Skipping</h3>
+            <div class="phase-meta">5–10 minutes · Cardio burst</div>
+          </div>
+          <svg class="phase-chevron" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+        </div>
+        <div class="phase-exercises" style="max-height:0;overflow:hidden">
+          <div class="exercise-card" onclick="showExercise('Rope Skipping','Jump at comfortable pace. If tired: 1 min skip + 30 sec rest intervals.','5–10 minutes total','cardio','#00E5A0')">
+            <div class="top"><h4>Rope Skipping</h4><span class="sets-reps">5–10 min</span></div>
+            <p>Improves stamina, burns fat. Use intervals if needed: 1 min skip + 30 sec rest.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 3: Strength -->
+      <div class="workout-phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div>
+            <h3>💪 3. Strength Workout</h3>
+            <div class="phase-meta">6 exercises · ~20 minutes</div>
+          </div>
+          <svg class="phase-chevron" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+        </div>
+        <div class="phase-exercises" style="max-height:0;overflow:hidden">
+          <div class="exercise-card" onclick="showExercise('Push Ups','Standard push-up from toes. Hands shoulder-width apart. Do knee push-ups if needed.','3 sets × 8–15 reps','pushup','#FF5C5C')">
+            <div class="top"><h4>Push Ups</h4><span class="sets-reps">3×8–15 reps</span></div>
+            <p>Chest, shoulders, triceps. Knee push-ups if needed as modification.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Dumbbell Curls','Bicep curls with dumbbells. Keep elbows close to body, full range of motion.','3 sets × 12 reps','curl','#FF5C5C')">
+            <div class="top"><h4>Dumbbell Curls</h4><span class="sets-reps">3×12 reps</span></div>
+            <p>Builds bicep strength and size. Control the movement both ways.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Shoulder Press','Press dumbbells overhead from shoulder height. Full extension at top.','3 sets × 12 reps','press','#FF5C5C')">
+            <div class="top"><h4>Shoulder Press</h4><span class="sets-reps">3×12 reps</span></div>
+            <p>Deltoids, upper chest, triceps. Keep core engaged throughout.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Squats','Feet shoulder-width apart. Push hips back and down. Keep chest up.','3 sets × 15 reps','squat','#FF5C5C')">
+            <div class="top"><h4>Squats</h4><span class="sets-reps">3×15 reps</span></div>
+            <p>Quads, glutes, hamstrings. The king of lower body exercises.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Lunges','Step forward, lower back knee toward floor. Keep front knee over ankle.','3 sets × 10 reps each leg','lunge','#FF5C5C')">
+            <div class="top"><h4>Lunges</h4><span class="sets-reps">3×10 each leg</span></div>
+            <p>Targets quads, glutes, and improves balance and stability.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Dumbbell Rows','Hinge forward, pull dumbbell to hip. Keep back flat, elbow tight.','3 sets × 12 reps each arm','row','#FF5C5C')">
+            <div class="top"><h4>Dumbbell Rows</h4><span class="sets-reps">3×12 each arm</span></div>
+            <p>Back, biceps, rear deltoids. Great for posture and pulling strength.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 4: Core -->
+      <div class="workout-phase">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div>
+            <h3>🧘 4. Core Workout</h3>
+            <div class="phase-meta">2 exercises · ~8 minutes</div>
+          </div>
+          <svg class="phase-chevron" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+        </div>
+        <div class="phase-exercises" style="max-height:0;overflow:hidden">
+          <div class="exercise-card" onclick="showExercise('Ab Roller','Kneel, roll forward slowly keeping core tight. Roll back using abs, not momentum.','3 sets × 8–10 reps','ab','#9B59B6')">
+            <div class="top"><h4>Ab Roller</h4><span class="sets-reps">3×8–10 reps</span></div>
+            <p>Go slowly and maintain form. Advanced core movement for full abs.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Plank','Hold plank position on forearms and toes. Keep hips level, breathe steadily.','30–60 seconds × 2 sets','plank','#9B59B6')">
+            <div class="top"><h4>Plank</h4><span class="sets-reps">30–60 sec × 2</span></div>
+            <p>Core stability, anti-rotation strength. Keep body straight as a board.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 5: Cardio Finish -->
+      <div class="workout-phase" style="margin-bottom:80px">
+        <div class="phase-header" onclick="togglePhase(this)">
+          <div>
+            <h3>🏃 5. Cardio Finish</h3>
+            <div class="phase-meta">Choose one · 20–40 minutes</div>
+          </div>
+          <svg class="phase-chevron" width="20" height="20" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M18 15l-6-6-6 6"/></svg>
+        </div>
+        <div class="phase-exercises" style="max-height:0;overflow:hidden">
+          <div class="exercise-card" onclick="showExercise('Cycling','Steady-state cycling at moderate pace. Excellent for fat burning and cardiovascular health.','20–40 minutes','cycling','#00E5A0')">
+            <div class="top"><h4>🚴 Cycling</h4><span class="sets-reps">20–40 min</span></div>
+            <p>Low-impact cardio. Great fat burner, easy on joints.</p>
+          </div>
+          <div class="exercise-card" onclick="showExercise('Fast Walk','Brisk walking at a pace that elevates heart rate. Arms swinging naturally.','30 minutes','walk','#00E5A0')">
+            <div class="top"><h4>🚶 Fast Walk</h4><span class="sets-reps">30 minutes</span></div>
+            <p>Accessible cardio, burns fat effectively, improves endurance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS PAGE -->
+    <div class="page" id="page-progress">
+      <div class="section-title">
+        <div class="section-num">P</div>
+        Progress Tracker
+      </div>
+
+      <!-- Monthly Calendar -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title" style="margin-bottom:0" id="calMonthLabel">May 2025</div>
+          <div style="display:flex;gap:8px">
+            <button onclick="changeMonth(-1)" style="width:28px;height:28px;border-radius:8px;background:var(--bg4);border:none;color:var(--text);cursor:pointer;font-size:14px">‹</button>
+            <button onclick="changeMonth(1)" style="width:28px;height:28px;border-radius:8px;background:var(--bg4);border:none;color:var(--text);cursor:pointer;font-size:14px">›</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px">
+          <span style="font-size:10px;color:var(--text3);text-align:center;font-weight:600">M</span>
+          <span style="font-size:10px;color:var(--text3);text-align:center;font-weight:600">T</span>
+          <span style="font-size:10px;color:var(--text3);text-align:center;font-weight:600">W</span>
+          <span style="font-size:10px;color:var(--text3);text-align:center;font-weight:600">T</span>
+          <span style="font-size:10px;color:var(--text3);text-align:center;font-weight:600">F</span>
+          <span style="font-size:10px;color:var(--text3);text-align:center;font-weight:600">S</span>
+          <span style="font-size:10px;color:var(--text3);text-align:center;font-weight:600">S</span>
+        </div>
+        <div class="calendar-full" id="fullCalendar"></div>
+      </div>
+
+      <!-- Weekly chart -->
+      <div class="card">
+        <div class="card-title">Workouts This Week</div>
+        <div class="chart-bars" id="weekChart"></div>
+        <div class="chart-labels" id="weekChartLabels"></div>
+      </div>
+
+      <!-- Best Streaks -->
+      <div class="card">
+        <div class="card-title">Personal Records</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <div style="text-align:center;background:var(--bg4);border-radius:var(--radius-sm);padding:12px">
+            <div style="font-family:var(--ff);font-weight:800;font-size:22px;color:var(--primary)" id="pr-streak">0</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px">Best Streak</div>
+          </div>
+          <div style="text-align:center;background:var(--bg4);border-radius:var(--radius-sm);padding:12px">
+            <div style="font-family:var(--ff);font-weight:800;font-size:22px;color:var(--gold)" id="pr-total">0</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px">Total Done</div>
+          </div>
+          <div style="text-align:center;background:var(--bg4);border-radius:var(--radius-sm);padding:12px">
+            <div style="font-family:var(--ff);font-weight:800;font-size:22px;color:var(--accent)" id="pr-month">0</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:2px">This Month</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exercise progress -->
+      <div class="card" style="margin-bottom:80px">
+        <div class="card-title">Exercise Completion Rate</div>
+        <div id="exerciseProgress"></div>
+      </div>
+    </div>
+
+    <!-- AI CHAT PAGE -->
+    <div class="page" id="page-chat" style="padding:0;display:none;flex-direction:column;height:100%;">
+      <div class="chat-suggestions" id="chatSuggestions">
+        <div class="suggest-chip" onclick="sendSuggestion('What should I eat before workout?')">Pre-workout meal?</div>
+        <div class="suggest-chip" onclick="sendSuggestion('How to improve push up count?')">Improve push-ups</div>
+        <div class="suggest-chip" onclick="sendSuggestion('Best time to workout for fat loss?')">Best workout time?</div>
+        <div class="suggest-chip" onclick="sendSuggestion('How much protein do I need daily?')">Protein intake?</div>
+        <div class="suggest-chip" onclick="sendSuggestion('How to avoid workout injuries?')">Avoid injuries</div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg ai">
+          <div class="bubble">
+            👋 Hey! I'm your AI fitness coach. Ask me anything about workouts, nutrition, recovery, or your plan!<br><br>
+            I can help with:<br>
+            • Exercise form and technique<br>
+            • Nutrition and diet advice<br>
+            • Recovery and sleep tips<br>
+            • Motivation and mindset
+          </div>
+          <div class="time">Now</div>
+        </div>
+      </div>
+      <div class="chat-input-wrap">
+        <textarea class="chat-input" id="chatInput" placeholder="Ask your fitness coach..." rows="1" onkeydown="handleChatKey(event)"></textarea>
+        <button class="send-btn" onclick="sendChat()">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="nav">
+    <button class="nav-btn active" onclick="showPage('home',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Home
+    </button>
+    <button class="nav-btn" onclick="showPage('workout',this)">
+      <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+      Workout
+    </button>
+    <button class="nav-btn" onclick="showPage('progress',this)">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Progress
+    </button>
+    <button class="nav-btn" onclick="showPage('chat',this)">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      AI Coach
+    </button>
+  </div>
+</div>
+
+<!-- EXERCISE ANIMATION MODAL -->
+<div class="animation-modal" id="exerciseModal" style="display:none" onclick="closeModal(event)">
+  <div class="anim-card" id="modalCard">
+    <div class="anim-header">
+      <h3 id="modalTitle">Exercise</h3>
+      <button class="close-btn" onclick="closeExerciseModal()">✕</button>
+    </div>
+    <div class="anim-visual" id="modalAnim"></div>
+    <div class="anim-info">
+      <p id="modalDesc" style="font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:10px"></p>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:12px;color:var(--text3)">Sets:</span>
+        <span id="modalSets" style="font-size:14px;font-weight:600;color:var(--primary)"></span>
+      </div>
+      <div class="anim-sets" id="setTracker"></div>
+      <button class="done-btn" onclick="markExerciseDone()">✓ Mark Complete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ACTIVE WORKOUT SCREEN -->
+<div class="workout-active" id="workoutActive" style="display:none">
+  <div class="wa-header">
+    <button class="wa-back" onclick="endWorkout()">✕</button>
+    <div class="wa-title">Today's Workout</div>
+    <div class="wa-timer" id="waTimer">00:00</div>
+  </div>
+  <div class="wa-content" id="waContent"></div>
+  <div class="wa-footer">
+    <button class="wa-btn secondary" onclick="endWorkout()">End Workout</button>
+    <button class="wa-btn primary" onclick="completeWorkout()">Complete ✓</button>
+  </div>
+</div>
+
+<!-- COMPLETION SCREEN -->
+<div class="completion" id="completionScreen" style="display:none">
+  <div class="completion-icon">🏆</div>
+  <h1>Workout Done!</h1>
+  <p>Consistency today = Transformation tomorrow</p>
+  <div class="completion-stats">
+    <div class="comp-stat"><div class="v" id="comp-time">0m</div><div class="l">Time</div></div>
+    <div class="comp-stat"><div class="v" id="comp-ex">0</div><div class="l">Exercises</div></div>
+    <div class="comp-stat"><div class="v" id="comp-streak">0🔥</div><div class="l">Streak</div></div>
+  </div>
+  <button class="start-btn" onclick="closeCompletion()">Back to Home</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ============ STATE ============
+var state = JSON.parse(localStorage.getItem('fitcore') || '{}');
+var defaults = {
+  streak: 0,
+  bestStreak: 0,
+  totalWorkouts: 0,
+  workoutDates: [],
+  exerciseChecks: {},
+  todayChecks: [],
+  water: 0,
+  steps: 0,
+  sleep: 0,
+  theme: 'dark',
+  completedExercises: {}
+};
+Object.keys(defaults).forEach(k => { if(state[k] === undefined) state[k] = defaults[k]; });
+
+function save() { localStorage.setItem('fitcore', JSON.stringify(state)); }
+
+var today = new Date().toDateString();
+var workoutTimer = null, workoutSeconds = 0;
+var calViewMonth = new Date().getMonth(), calViewYear = new Date().getFullYear();
+var currentExercise = null;
+var currentSets = 0;
+var completedSets = [];
+
+// ============ EXERCISES DATA ============
+var todayExs = [
+  {id:'warmup', name:'Warm Up', sets:'5 min', icon:'🌅', color:'rgba(255,209,102,0.15)', textColor:'#FFD166'},
+  {id:'skippping', name:'Rope Skipping', sets:'5–10 min', icon:'🪢', color:'rgba(0,229,160,0.15)', textColor:'#00E5A0'},
+  {id:'pushup', name:'Push Ups', sets:'3×8–15', icon:'💪', color:'rgba(255,92,92,0.15)', textColor:'#FF5C5C'},
+  {id:'curls', name:'Dumbbell Curls', sets:'3×12', icon:'🏋️', color:'rgba(255,92,92,0.15)', textColor:'#FF5C5C'},
+  {id:'squats', name:'Squats', sets:'3×15', icon:'🦵', color:'rgba(255,92,92,0.15)', textColor:'#FF5C5C'},
+  {id:'plank', name:'Plank', sets:'30–60s×2', icon:'🧘', color:'rgba(155,89,182,0.15)', textColor:'#9B59B6'},
+  {id:'cardio', name:'Cardio Finish', sets:'30 min', icon:'🏃', color:'rgba(0,229,160,0.15)', textColor:'#00E5A0'},
+];
+
+var exerciseStats = [
+  {name:'Push Ups', target:100},
+  {name:'Squats', target:100},
+  {name:'Lunges', target:80},
+  {name:'Plank', target:30},
+  {name:'Rope Skipping', target:25},
+];
+
+// ============ INIT ============
+function init() {
+  if(state.theme === 'light') document.documentElement.classList.add('light');
+  updateGreeting();
+  renderTodayExercises();
+  updateStats();
+  renderWeekCalendar();
+  renderFullCalendar();
+  renderWeekChart();
+  renderExerciseProgress();
+  updateDailyTargets();
+  updateProgressRing();
+}
+
+function updateGreeting() {
+  var h = new Date().getHours();
+  var greet = h<12 ? 'Good Morning! 💪' : h<17 ? 'Good Afternoon! 🌤️' : 'Good Evening! 🌙';
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var d = new Date();
+  document.getElementById('greetMsg').textContent = greet;
+  document.getElementById('dateStr').textContent = days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function renderTodayExercises() {
+  var html = '';
+  var checks = state.todayChecks || [];
+  todayExs.forEach((ex,i) => {
+    var done = checks.includes(ex.id);
+    html += '<div class="exercise-row">' +
+      '<div class="ex-icon" style="background:'+ex.color+';color:'+ex.textColor+'">'+ex.icon+'</div>' +
+      '<div class="ex-info"><div class="ex-name">'+ex.name+'</div><div class="ex-sets">'+ex.sets+'</div></div>' +
+      '<div class="ex-check '+(done?'done':'')+'" onclick="toggleCheck(\''+ex.id+'\',this)"></div>' +
+      '</div>';
+  });
+  document.getElementById('todayExercises').innerHTML = html;
+  updateProgressRing();
+}
+
+function toggleCheck(id, el) {
+  var checks = state.todayChecks || [];
+  if(checks.includes(id)) {
+    state.todayChecks = checks.filter(c => c !== id);
+    el.classList.remove('done');
+  } else {
+    state.todayChecks.push(id);
+    el.classList.add('done');
+  }
+  save();
+  updateProgressRing();
+}
+
+function updateProgressRing() {
+  var done = (state.todayChecks || []).length;
+  var total = todayExs.length;
+  var pct = Math.round(done/total*100);
+  var circumference = 364.4;
+  var offset = circumference - (pct/100)*circumference;
+  document.getElementById('progressRing').setAttribute('stroke-dashoffset', offset);
+  document.getElementById('progressPct').textContent = pct + '%';
+}
+
+function updateStats() {
+  var thisMonth = new Date().getMonth();
+  var thisYear = new Date().getFullYear();
+  var monthDates = (state.workoutDates||[]).filter(d => {
+    var dt = new Date(d); return dt.getMonth()===thisMonth && dt.getFullYear()===thisYear;
+  });
+  document.getElementById('st-streak').innerHTML = state.streak + '<span class="unit">days</span>';
+  document.getElementById('st-total').innerHTML = monthDates.length + '<span class="unit">done</span>';
+  document.getElementById('streakCount').textContent = state.streak;
+  document.getElementById('pr-streak').textContent = state.bestStreak;
+  document.getElementById('pr-total').textContent = state.totalWorkouts;
+  document.getElementById('pr-month').textContent = monthDates.length;
+}
+
+function renderWeekCalendar() {
+  var today = new Date();
+  var dayOfWeek = today.getDay();
+  var monday = new Date(today);
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  var html = '';
+  for(var i=0;i<7;i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate()+i);
+    var ds = d.toDateString();
+    var isToday = ds === today.toDateString();
+    var isDone = state.workoutDates && state.workoutDates.includes(ds);
+    var isPast = d < today && !isToday;
+    var cls = isToday ? 'today' : isDone ? 'done' : isPast ? 'missed' : 'rest';
+    html += '<div class="streak-day '+cls+'">'+d.getDate()+'</div>';
+  }
+  document.getElementById('weekCalendar').innerHTML = html;
+}
+
+function renderFullCalendar() {
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent = months[calViewMonth] + ' ' + calViewYear;
+  var firstDay = new Date(calViewYear, calViewMonth, 1).getDay();
+  var offset = firstDay === 0 ? 6 : firstDay - 1;
+  var daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
+  var today = new Date();
+  var html = '';
+  for(var i=0;i<offset;i++) html += '<div class="cal-day empty"></div>';
+  for(var d=1;d<=daysInMonth;d++) {
+    var date = new Date(calViewYear, calViewMonth, d);
+    var ds = date.toDateString();
+    var isToday = date.toDateString() === today.toDateString();
+    var isDone = state.workoutDates && state.workoutDates.includes(ds);
+    var isFuture = date > today;
+    var cls = isToday ? 'today' : isDone ? 'done' : isFuture ? 'future' : 'rest';
+    html += '<div class="cal-day '+cls+'"><span class="num">'+d+'</span></div>';
+  }
+  document.getElementById('fullCalendar').innerHTML = html;
+}
+
+function changeMonth(dir) {
+  calViewMonth += dir;
+  if(calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  if(calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+  renderFullCalendar();
+}
+
+function renderWeekChart() {
+  var days = ['M','T','W','T','F','S','S'];
+  var today = new Date();
+  var dayOfWeek = today.getDay();
+  var monday = new Date(today);
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  var maxH = 80;
+  var barsHtml = '', labelsHtml = '';
+  for(var i=0;i<7;i++) {
+    var d = new Date(monday); d.setDate(monday.getDate()+i);
+    var isDone = state.workoutDates && state.workoutDates.includes(d.toDateString());
+    var isToday = d.toDateString() === today.toDateString();
+    var h = isDone ? maxH : (isToday ? 20 : 8);
+    var cls = isDone ? 'active' : '';
+    barsHtml += '<div class="chart-bar '+cls+'" style="height:'+h+'px">'+(isDone?'<span class="tip">✓</span>':'')+'</div>';
+    labelsHtml += '<span>'+days[i]+'</span>';
+  }
+  document.getElementById('weekChart').innerHTML = barsHtml;
+  document.getElementById('weekChartLabels').innerHTML = labelsHtml;
+}
+
+function renderExerciseProgress() {
+  var total = state.totalWorkouts || 1;
+  var html = '';
+  exerciseStats.forEach(ex => {
+    var done = Math.min(total * 3, ex.target);
+    var pct = Math.round(done/ex.target*100);
+    html += '<div style="margin-bottom:12px">' +
+      '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">' +
+      '<span>'+ex.name+'</span><span style="color:var(--primary);font-weight:600">'+pct+'%</span></div>' +
+      '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>' +
+      '</div>';
+  });
+  document.getElementById('exerciseProgress').innerHTML = html;
+}
+
+function updateDailyTargets() {
+  var waterPct = Math.min((state.water||0)/4*100, 100);
+  var stepsPct = Math.min((state.steps||0)/10000*100, 100);
+  var sleepPct = Math.min((state.sleep||0)/8*100, 100);
+  document.getElementById('waterVal').textContent = (state.water||0) + ' / 4L';
+  document.getElementById('stepsVal').textContent = ((state.steps||0)/1000).toFixed(1) + 'k / 10k';
+  document.getElementById('sleepVal').textContent = (state.sleep||0) + ' / 8h';
+  document.getElementById('waterBar').style.width = waterPct + '%';
+  document.getElementById('stepsBar').style.width = stepsPct + '%';
+  document.getElementById('sleepBar').style.width = sleepPct + '%';
+}
+
+// ============ DAILY LOGGING ============
+function logWater() {
+  state.water = Math.min((state.water||0) + 0.5, 4);
+  save(); updateDailyTargets(); showToast('💧 +0.5L water logged!');
+}
+function logSteps() {
+  state.steps = Math.min((state.steps||0) + 1000, 10000);
+  save(); updateDailyTargets(); showToast('👟 +1000 steps logged!');
+}
+function logSleep() {
+  state.sleep = Math.min((state.sleep||0) + 1, 8);
+  save(); updateDailyTargets(); showToast('😴 +1hr sleep logged!');
+}
+
+// ============ PAGE NAVIGATION ============
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  var page = document.getElementById('page-'+id);
+  if(id === 'chat') {
+    page.style.display = 'flex';
+    page.classList.add('active');
+  } else {
+    page.style.display = 'block';
+    page.classList.add('active');
+  }
+  btn.classList.add('active');
+  if(id === 'progress') { renderFullCalendar(); renderWeekChart(); updateStats(); renderExerciseProgress(); }
+}
+
+// ============ PHASE TOGGLE ============
+function togglePhase(header) {
+  var exercises = header.nextElementSibling;
+  var chevron = header.querySelector('.phase-chevron');
+  if(exercises.style.maxHeight === '0px' || exercises.style.maxHeight === '0') {
+    exercises.style.maxHeight = '1000px';
+    chevron.classList.add('open');
+  } else {
+    exercises.style.maxHeight = '0';
+    chevron.classList.remove('open');
+  }
+}
+
+// ============ EXERCISE MODAL ============
+var ANIMATIONS = {
+  pushup: `<svg class="stickman" width="140" height="120" viewBox="0 0 140 120">
+    <g style="animation:pushup 1.2s ease-in-out infinite">
+      <circle cx="70" cy="20" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="30" x2="70" y2="58" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="40" x2="45" y2="55" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="40" x2="95" y2="55" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="58" x2="50" y2="80" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="58" x2="90" y2="80" stroke="var(--primary)" stroke-width="2.5"/>
+      <circle cx="45" cy="56" r="4" fill="var(--primary)"/>
+      <circle cx="95" cy="56" r="4" fill="var(--primary)"/>
+    </g>
+    <text x="70" y="110" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Push Ups</text>
+  </svg>`,
+  curl: `<svg class="stickman" width="140" height="130" viewBox="0 0 140 130">
+    <g>
+      <circle cx="70" cy="20" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="30" x2="70" y2="65" stroke="var(--primary)" stroke-width="2.5"/>
+      <g style="transform-origin:70px 42px;animation:curl 1.4s ease-in-out infinite">
+        <line x1="70" y1="42" x2="40" y2="58" stroke="var(--primary)" stroke-width="2.5"/>
+        <circle cx="38" cy="60" r="5" fill="var(--gold)"/>
+      </g>
+      <line x1="70" y1="42" x2="100" y2="58" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="65" x2="55" y2="95" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="65" x2="85" y2="95" stroke="var(--primary)" stroke-width="2.5"/>
+    </g>
+    <text x="70" y="118" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Dumbbell Curl</text>
+  </svg>`,
+  press: `<svg class="stickman" width="140" height="130" viewBox="0 0 140 130">
+    <g style="animation:pushup 1.3s ease-in-out infinite">
+      <circle cx="70" cy="22" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="32" x2="70" y2="68" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="44" x2="38" y2="28" stroke="var(--primary)" stroke-width="2.5"/>
+      <circle cx="34" cy="25" r="6" fill="var(--gold)"/>
+      <line x1="70" y1="44" x2="102" y2="28" stroke="var(--primary)" stroke-width="2.5"/>
+      <circle cx="106" cy="25" r="6" fill="var(--gold)"/>
+      <line x1="70" y1="68" x2="55" y2="98" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="68" x2="85" y2="98" stroke="var(--primary)" stroke-width="2.5"/>
+    </g>
+    <text x="70" y="118" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Shoulder Press</text>
+  </svg>`,
+  squat: `<svg class="stickman" width="140" height="130" viewBox="0 0 140 130">
+    <g style="animation:squat 1.2s ease-in-out infinite">
+      <circle cx="70" cy="22" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="32" x2="70" y2="66" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="44" x2="45" y2="54" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="44" x2="95" y2="54" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="66" x2="48" y2="92" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="48" y1="92" x2="42" y2="110" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="66" x2="92" y2="92" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="92" y1="92" x2="98" y2="110" stroke="var(--primary)" stroke-width="2.5"/>
+    </g>
+    <text x="70" y="125" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Squats</text>
+  </svg>`,
+  lunge: `<svg class="stickman" width="140" height="130" viewBox="0 0 140 130">
+    <g style="animation:lunge-move 1.4s ease-in-out infinite">
+      <circle cx="60" cy="22" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="60" y1="32" x2="60" y2="64" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="60" y1="44" x2="40" y2="54" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="60" y1="44" x2="80" y2="54" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="60" y1="64" x2="40" y2="92" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="40" y1="92" x2="35" y2="110" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="60" y1="64" x2="88" y2="80" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="88" y1="80" x2="100" y2="110" stroke="var(--primary)" stroke-width="2.5"/>
+    </g>
+    <text x="70" y="125" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Lunges</text>
+  </svg>`,
+  row: `<svg class="stickman" width="140" height="130" viewBox="0 0 140 130">
+    <g style="transform:rotate(20deg) translateX(10px) translateY(10px)">
+      <circle cx="60" cy="30" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="60" y1="40" x2="60" y2="72" stroke="var(--primary)" stroke-width="2.5"/>
+      <g style="transform-origin:60px 52px;animation:row-arm 1.2s ease-in-out infinite">
+        <line x1="60" y1="52" x2="35" y2="65" stroke="var(--primary)" stroke-width="2.5"/>
+        <circle cx="32" cy="67" r="5" fill="var(--gold)"/>
+      </g>
+      <line x1="60" y1="52" x2="85" y2="65" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="60" y1="72" x2="45" y2="100" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="60" y1="72" x2="75" y2="100" stroke="var(--primary)" stroke-width="2.5"/>
+    </g>
+    <text x="70" y="122" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Dumbbell Row</text>
+  </svg>`,
+  plank: `<svg class="stickman" width="160" height="100" viewBox="0 0 160 100">
+    <g style="animation:plank-pulse 1.5s ease-in-out infinite">
+      <circle cx="28" cy="42" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="38" y1="46" x2="130" y2="56" stroke="var(--primary)" stroke-width="3"/>
+      <line x1="60" y1="50" x2="62" y2="72" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="62" y1="72" x2="55" y2="82" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="100" y1="54" x2="102" y2="76" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="102" y1="76" x2="110" y2="82" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="130" y1="56" x2="138" y2="44" stroke="var(--primary)" stroke-width="2.5"/>
+    </g>
+    <text x="80" y="96" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Plank Hold</text>
+  </svg>`,
+  ab: `<svg class="stickman" width="140" height="120" viewBox="0 0 140 120">
+    <g style="animation:pushup 1.4s ease-in-out infinite">
+      <circle cx="40" cy="30" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="40" y1="40" x2="100" y2="60" stroke="var(--primary)" stroke-width="3"/>
+      <line x1="60" y1="46" x2="52" y2="68" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="80" y1="52" x2="82" y2="74" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="40" y1="40" x2="38" y2="28" stroke="var(--primary)" stroke-width="2.5"/>
+      <circle cx="60" cy="76" r="6" fill="var(--primary)" opacity="0.6"/>
+    </g>
+    <text x="70" y="108" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Ab Roller</text>
+  </svg>`,
+  warmup: `<svg class="stickman" width="140" height="130" viewBox="0 0 140 130">
+    <g style="animation:jump 1s ease-in-out infinite">
+      <circle cx="70" cy="22" r="10" fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+      <line x1="70" y1="32" x2="70" y2="68" stroke="var(--gold)" stroke-width="2.5"/>
+      <line x1="70" y1="44" x2="40" y2="30" stroke="var(--gold)" stroke-width="2.5"/>
+      <line x1="70" y1="44" x2="100" y2="30" stroke="var(--gold)" stroke-width="2.5"/>
+      <line x1="70" y1="68" x2="50" y2="96" stroke="var(--gold)" stroke-width="2.5"/>
+      <line x1="70" y1="68" x2="90" y2="96" stroke="var(--gold)" stroke-width="2.5"/>
+    </g>
+    <text x="70" y="118" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Warm Up</text>
+  </svg>`,
+  cardio: `<svg class="stickman" width="140" height="130" viewBox="0 0 140 130">
+    <g style="animation:jump 0.7s ease-in-out infinite">
+      <circle cx="70" cy="22" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="32" x2="70" y2="66" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="44" x2="48" y2="58" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="44" x2="92" y2="52" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="66" x2="50" y2="92" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="66" x2="94" y2="84" stroke="var(--primary)" stroke-width="2.5"/>
+    </g>
+    <text x="70" y="118" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Cardio</text>
+  </svg>`,
+  cycling: `<svg width="140" height="120" viewBox="0 0 140 120">
+    <g style="animation:float 1.5s ease-in-out infinite">
+      <circle cx="34" cy="80" r="22" fill="none" stroke="var(--primary)" stroke-width="3"/>
+      <circle cx="106" cy="80" r="22" fill="none" stroke="var(--primary)" stroke-width="3"/>
+      <circle cx="70" cy="60" r="8" fill="none" stroke="var(--primary)" stroke-width="2"/>
+      <line x1="70" y1="68" x2="106" y2="80" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="68" x2="56" y2="80" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="56" y1="80" x2="34" y2="80" stroke="var(--primary)" stroke-width="2"/>
+      <circle cx="70" cy="40" r="9" fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+      <line x1="70" y1="49" x2="70" y2="60" stroke="var(--gold)" stroke-width="2.5"/>
+      <line x1="60" y1="54" x2="70" y2="54" stroke="var(--gold)" stroke-width="2.5"/>
+    </g>
+    <text x="70" y="115" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Cycling</text>
+  </svg>`,
+  walk: `<svg class="stickman" width="140" height="130" viewBox="0 0 140 130">
+    <g style="animation:lunge-move 0.8s ease-in-out infinite">
+      <circle cx="70" cy="22" r="10" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="32" x2="70" y2="66" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="44" x2="50" y2="60" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="44" x2="88" y2="58" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="66" x2="52" y2="92" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="52" y1="92" x2="46" y2="108" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="70" y1="66" x2="88" y2="90" stroke="var(--primary)" stroke-width="2.5"/>
+      <line x1="88" y1="90" x2="96" y2="108" stroke="var(--primary)" stroke-width="2.5"/>
+    </g>
+    <text x="70" y="122" text-anchor="middle" fill="var(--text2)" font-size="11" font-family="DM Sans">Fast Walk</text>
+  </svg>`,
+};
+
+function showExercise(name, desc, sets, type, color) {
+  currentExercise = {name, desc, sets, type, color};
+  var numSets = 3;
+  if(sets.includes('2 sets') || sets.includes('×2')) numSets = 2;
+  if(sets.includes('1 ') || sets.includes('30 min') || sets.includes('5–10')) numSets = 1;
+  currentSets = numSets;
+  completedSets = [];
+  document.getElementById('modalTitle').textContent = name;
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('modalSets').textContent = sets;
+  document.getElementById('modalAnim').innerHTML = ANIMATIONS[type] || ANIMATIONS['cardio'];
+  var setHtml = '';
+  for(var i=0;i<numSets;i++) {
+    setHtml += '<div class="set-pill" id="set-'+i+'" onclick="toggleSet('+i+')">Set '+(i+1)+'</div>';
+  }
+  document.getElementById('setTracker').innerHTML = setHtml;
+  document.getElementById('exerciseModal').style.display = 'flex';
+}
+
+function toggleSet(i) {
+  var pill = document.getElementById('set-'+i);
+  if(completedSets.includes(i)) {
+    completedSets = completedSets.filter(s=>s!==i);
+    pill.classList.remove('active','done');
+  } else {
+    completedSets.push(i);
+    pill.classList.add('active');
+  }
+}
+
+function markExerciseDone() {
+  if(currentExercise) {
+    for(var i=0;i<currentSets;i++) {
+      var pill = document.getElementById('set-'+i);
+      if(pill) pill.classList.add('done');
+    }
+    showToast('✅ ' + currentExercise.name + ' completed!');
+    setTimeout(closeExerciseModal, 800);
+  }
+}
+
+function closeExerciseModal() {
+  document.getElementById('exerciseModal').style.display = 'none';
+}
+
+function closeModal(e) {
+  if(e.target === document.getElementById('exerciseModal')) closeExerciseModal();
+}
+
+// ============ ACTIVE WORKOUT ============
+function startWorkout() {
+  var allExercises = [
+    {name:'Warm Up', detail:'5 min · Neck Rotation, Arm Circles, Stretching, Jumping Jacks', sets:1},
+    {name:'Rope Skipping', detail:'5–10 minutes · Comfortable pace', sets:1},
+    {name:'Push Ups', detail:'3 sets × 8–15 reps · Knee push-ups if needed', sets:3},
+    {name:'Dumbbell Curls', detail:'3 sets × 12 reps', sets:3},
+    {name:'Shoulder Press', detail:'3 sets × 12 reps', sets:3},
+    {name:'Squats', detail:'3 sets × 15 reps', sets:3},
+    {name:'Lunges', detail:'3 sets × 10 reps each leg', sets:3},
+    {name:'Dumbbell Rows', detail:'3 sets × 12 reps each arm', sets:3},
+    {name:'Ab Roller', detail:'3 sets × 8–10 reps · Go slowly', sets:3},
+    {name:'Plank', detail:'30–60 seconds × 2 sets', sets:2},
+    {name:'Cardio Finish', detail:'Cycling 20–40 min OR Fast Walk 30 min', sets:1},
+  ];
+  var html = '';
+  allExercises.forEach((ex, idx) => {
+    var sets = '';
+    for(var i=0;i<ex.sets;i++) {
+      sets += '<div class="wa-set" onclick="this.classList.toggle(\'done\')">'+('S'+(i+1))+'</div>';
+    }
+    html += '<div class="wa-exercise">' +
+      '<div class="wa-ex-name">'+(idx+1)+'. '+ex.name+'</div>' +
+      '<div class="wa-ex-detail">'+ex.detail+'</div>' +
+      '<div class="wa-set-tracker">'+sets+'</div>' +
+      '</div>';
+  });
+  document.getElementById('waContent').innerHTML = html;
+  document.getElementById('workoutActive').style.display = 'flex';
+  workoutSeconds = 0;
+  workoutTimer = setInterval(() => {
+    workoutSeconds++;
+    var m = Math.floor(workoutSeconds/60);
+    var s = workoutSeconds%60;
+    document.getElementById('waTimer').textContent = 
+      String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }, 1000);
+}
+
+function endWorkout() {
+  clearInterval(workoutTimer);
+  document.getElementById('workoutActive').style.display = 'none';
+}
+
+function completeWorkout() {
+  clearInterval(workoutTimer);
+  document.getElementById('workoutActive').style.display = 'none';
+  var mins = Math.floor(workoutSeconds/60);
+  var todayStr = new Date().toDateString();
+  if(!state.workoutDates) state.workoutDates = [];
+  if(!state.workoutDates.includes(todayStr)) {
+    state.workoutDates.push(todayStr);
+    state.totalWorkouts = (state.totalWorkouts||0)+1;
+    calculateStreak();
+  }
+  state.todayChecks = todayExs.map(e=>e.id);
+  save();
+  document.getElementById('comp-time').textContent = (mins||1) + 'm';
+  document.getElementById('comp-ex').textContent = '11';
+  document.getElementById('comp-streak').textContent = state.streak + '🔥';
+  document.getElementById('completionScreen').style.display = 'flex';
+  updateStats();
+  renderTodayExercises();
+  renderWeekCalendar();
+}
+
+function calculateStreak() {
+  var dates = state.workoutDates || [];
+  if(dates.length === 0) { state.streak = 0; return; }
+  dates.sort((a,b) => new Date(b) - new Date(a));
+  var streak = 0;
+  var check = new Date();
+  check.setHours(0,0,0,0);
+  for(var d of dates) {
+    var dt = new Date(d); dt.setHours(0,0,0,0);
+    var diff = (check - dt) / 86400000;
+    if(diff <= 1) { streak++; check = dt; } else break;
+  }
+  state.streak = streak;
+  state.bestStreak = Math.max(state.bestStreak||0, streak);
+  document.getElementById('streakCount').textContent = streak;
+}
+
+function closeCompletion() {
+  document.getElementById('completionScreen').style.display = 'none';
+  updateStats();
+}
+
+// ============ AI CHAT ============
+var chatHistory = [];
+
+async function sendChat() {
+  var input = document.getElementById('chatInput');
+  var msg = input.value.trim();
+  if(!msg) return;
+  input.value = '';
+  addChatMsg('user', msg);
+  chatHistory.push({role:'user', content:msg});
+  document.getElementById('chatSuggestions').style.display = 'none';
+  var thinkingEl = addThinking();
+  try {
+    var res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:`You are FitCore AI, a personal fitness and nutrition coach assistant embedded in a fitness tracking app. 
+The user follows this daily workout plan:
+1. Warm Up (5 min): Neck Rotation, Arm Circles, Light Stretching, Jumping Jacks
+2. Rope Skipping (5-10 min): For stamina and fat burn
+3. Strength Workout: Push Ups (3×8-15), Dumbbell Curls (3×12), Shoulder Press (3×12), Squats (3×15), Lunges (3×10), Dumbbell Rows (3×12)
+4. Core Workout: Ab Roller (3×8-10), Plank (30-60s×2)
+5. Cardio Finish: Cycling 20-40min OR Fast Walk 30min
+Daily targets: 2100-2200 kcal, 100-120g protein, 3-4L water, 8000-10000 steps, 7-8hr sleep.
+Post workout: Whey Protein, Milk, or Soya Chunks.
+Be encouraging, specific, and scientifically accurate. Keep responses concise and actionable. Use emojis sparingly.`,
+        messages:chatHistory
+      })
+    });
+    var data = await res.json();
+    var reply = data.content && data.content[0] ? data.content[0].text : 'Sorry, I could not connect. Please try again!';
+    thinkingEl.remove();
+    addChatMsg('ai', reply);
+    chatHistory.push({role:'assistant', content:reply});
+  } catch(e) {
+    thinkingEl.remove();
+    addChatMsg('ai', '🔌 Connection issue. Make sure you\'re online and try again!');
+  }
+}
+
+function addChatMsg(role, text) {
+  var msgs = document.getElementById('chatMessages');
+  var now = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  var div = document.createElement('div');
+  div.className = 'chat-msg ' + role;
+  div.innerHTML = '<div class="bubble">' + text.replace(/\n/g,'<br>') + '</div><div class="time">'+now+'</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function addThinking() {
+  var msgs = document.getElementById('chatMessages');
+  var div = document.createElement('div');
+  div.className = 'chat-msg ai';
+  div.innerHTML = '<div class="bubble"><div class="ai-thinking"><span></span><span></span><span></span></div></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function sendSuggestion(text) {
+  document.getElementById('chatInput').value = text;
+  sendChat();
+}
+
+function handleChatKey(e) {
+  if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+// ============ THEME ============
+function toggleTheme() {
+  document.documentElement.classList.toggle('light');
+  state.theme = document.documentElement.classList.contains('light') ? 'light' : 'dark';
+  save();
+}
+
+// ============ TOAST ============
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============ START ============
+init();
+</script>
+</body>
+</html>
